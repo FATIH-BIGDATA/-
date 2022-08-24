@@ -1,0 +1,34 @@
+library(igraph)
+load("sample.RData")
+(m <- graph.data.frame(data))
+
+summary(m)
+
+vcount(m)                               #--- Vertex 노드의 수 
+V(m)                                    #--- Vertex
+
+ecount(m)                               #--- Edge 선의 개수
+E(m)                                    #--- Edge
+get.edge.attribute(m, "friend_tie")     #--- Edge attribute
+get.edge.attribute(m, "social_tie")     #--- Edge attribute
+get.edge.attribute(m, "task_tie")       #--- Edge attribute
+
+(mFriend <- delete.edges(m, E(m)[get.edge.attribute(m, name = "friend_tie") == 0]))
+(mSocial <- delete.edges(m, E(m)[get.edge.attribute(m, name = "social_tie") == 0]))
+(mTask <- delete.edges(m, E(m)[get.edge.attribute(m, name = "task_tie") == 0]))
+
+summary(mFriend)
+plot(mFriend)
+(mFriend <- as.undirected(mFriend, mode = "collapse"))   #--- 방향이 없는 그래프로 변경
+(mFriend <- delete.vertices(mFriend, V(mFriend)[degree(mFriend) == 0]))   #--- 고립되어 있는 노드를 네트워크에서 제거
+summary(mFriend)
+plot(mFriend)
+
+(mFriend01 <- walktrap.community(mFriend, steps = 200, modularity = TRUE))
+plot(as.dendrogram(mFriend01, use.modularity = TRUE))
+mFriend01$modularity
+
+
+
+mFriend02<-edge.betweenness.community(mFriend)
+plot(as.dendrogram(mFriend02, use.modularity = TRUE))
